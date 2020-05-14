@@ -77,7 +77,7 @@ namespace drawRandom
             if(totalNum == 1)
             {
                 MessageBox.Show("姓名文件为空!请编辑name.in来添加姓名,每行一个", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                System.Environment.Exit(0);
             }
             MessageBox.Show("导入成功!共导入" + (totalNum - 1) + "人", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             totalLabel.Text = (totalNum - 1) + "";
@@ -133,7 +133,7 @@ namespace drawRandom
             DialogResult result = MessageBox.Show("确定要退出吗？", "drawRandom "+ver, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if(result == DialogResult.Yes)
             {
-                Application.Exit();
+                System.Environment.Exit(0);
             }
         }
 
