@@ -12,155 +12,338 @@ namespace drawRandom
 {
     public partial class main : Form
     {
-        private string ver = "v2.0beta";
+        private string ver = "v3.0beta";
 
         private string nameFilePath = @"name.in";
         private string saveFilePath = @"save.out";
 
-        private string[] name = new string[101];
-        private bool[] drawed = new bool  [101];
+        private int nowDrawingClass = 0;
+        private int maxClass = 10; //最多班级数
 
-        private int totalNum = 1;
-        private int totalSave= 0;
-
-        private int randomNum()
-        {
-            return new Random(Guid.NewGuid().GetHashCode()).Next(1, totalNum);
-        }
-
-        private void clean()
-        {
-            draw.Text = "清理中...";
-            for (int i = 0; i <= 100; i++) drawed[i] = false;
-            totalSave = 0;
-            drawedLabel.Text = "0";
-            draw.Text = "清理完毕";
-            //MessageBox.Show("清理完毕","提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void save()
-        {
-            int saveItem = 0;
-            StreamWriter sw1 = new StreamWriter(saveFilePath);
-            for (int i = 1; i <= totalNum; i++)
-            {
-                if(drawed[i])
-                {
-                    saveItem++;
-                    sw1.WriteLine(i);
-                }
-            }
-            sw1.Close();
-            //MessageBox.Show("保存完毕,共保存"+saveItem+"人", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            draw.Text = "保存" + saveItem + "人";
-        }
+        private List<Class> Classes = new List<Class>();
 
         public main()
         {
             InitializeComponent();
             this.Text = "drawRandom " + ver;
-            for (int i = 0; i <= 100; i++) drawed[i] = false;
             if (!File.Exists(nameFilePath))
             {
-                MessageBox.Show("姓名文件不存在!请检查目录下是否存在name.in文件或检查程序是否有权限访问本目录文件!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
-            }
-
-            StreamReader nameStream = new StreamReader(nameFilePath, Encoding.Default);
-            string nextLine;
-            while( (nextLine = nameStream.ReadLine()) != null)
-            {
-                name[totalNum] = nextLine;
-                totalNum++;
-            }
-            nameStream.Close();
-            if(totalNum == 1)
-            {
-                MessageBox.Show("姓名文件为空!请编辑name.in来添加姓名,每行一个", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("姓名文件不存在!请检查目录下是否存在name.in文件或检查程序是否有权限访问本目录文件!", 
+                    "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 System.Environment.Exit(0);
             }
-            MessageBox.Show("导入成功!共导入" + (totalNum - 1) + "人", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            totalLabel.Text = (totalNum - 1) + "";
-
-            int nextDrawed = 0;
-            string tips = "[ ";
-            if (File.Exists(saveFilePath))
+            StreamReader nameStream = new StreamReader(nameFilePath, Encoding.Default);
+            string nextLine;
+            while ((nextLine = nameStream.ReadLine()) != null)
             {
-                StreamReader saveStream = new StreamReader(saveFilePath, Encoding.Default);
-                while (!string.IsNullOrEmpty(nextLine = saveStream.ReadLine()))
+                nextLine = nextLine.Trim();
+                int classCharStart = nextLine.IndexOf('[');
+                int classCharEnd = nextLine.LastIndexOf(']');
+                if(classCharStart >= 0 && classCharEnd >= 0 && classCharStart != classCharEnd)
                 {
-                    try
+                    if(Classes.Count == maxClass)
                     {
-                        nextDrawed = int.Parse(nextLine);
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("进度文件损坏,内有非数字字符.清空进度...", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        totalSave = 0;
-                        clean();
+                        //达到最大班级数
+                        MessageBox.Show("达到最大班级数:"+maxClass+"!后续将不会导入.最后一个导入的班级:"+Classes[Classes.Count-1].Name, 
+                            "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         break;
                     }
-                    drawed[nextDrawed] = true;
-                    totalSave++;
-                    tips += name[nextDrawed];
-                    tips += " ";
+                    string className = nextLine.Substring(classCharStart + 1, classCharEnd - classCharStart - 1);
+                    Classes.Add(new Class(className));
+                    chooseClassCombo.Items.Add(className);
+                }
+                else
+                {
+                    //非班级标识行
+                    if (Classes.Count == 0)
+                    {
+                        //错误，没有配套班级标识符
+                        MessageBox.Show("缺少班级标识符!请检查name.in文件是否按照规则填写!", 
+                            "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        System.Environment.Exit(0);
+                    }
+                    int blankspacePos = nextLine.IndexOf(' ');
+                    string id = nextLine.Substring(0, blankspacePos);
+                    string name = nextLine.Substring(blankspacePos + 1);
+                    if(!Classes[Classes.Count-1].Add(id, name)) //将学生信息写入
+                    {
+                        //班级满员
+                        MessageBox.Show("班级"+Classes[Classes.Count].Name+"达到最大人数:"+Classes[Classes.Count-1].Max+"人,请予以纠正!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        System.Environment.Exit(0);
+                    }
+                }
+            }
+            nameStream.Close();
+            int savedCount = 0;
+            int lastClassPos = -1;
+            if (File.Exists(saveFilePath))
+            {
+                StreamReader saveStream = new StreamReader(saveFilePath, Encoding.UTF8);
+                while (!string.IsNullOrEmpty(nextLine = saveStream.ReadLine()))
+                {
+                    if (savedCount > maxClass) break;
+                    nextLine = nextLine.Trim();
+                    int saveCharStart = nextLine.IndexOf('[');
+                    int saveCharEnd = nextLine.LastIndexOf(']');
+                    if (saveCharStart >= 0 && saveCharEnd >= 0 && saveCharStart != saveCharEnd)
+                    {
+                        //班级标识
+                        string className = nextLine.Substring(saveCharStart + 1, saveCharEnd - saveCharStart - 1);
+                        bool ifFindClass = false;
+                        for(int i = 0;i < Classes.Count;i++)
+                        {
+                            if (Classes[i].Name == className)
+                            {
+                                lastClassPos = i;
+                                ifFindClass = true;
+                                break;
+                            }
+                        }
+                        if(!ifFindClass)
+                        {
+                            //没有找到对应班级
+                            MessageBox.Show("保存进度错误,找不到已经保存的班级,将不会继续读取抽签进度!",
+                               "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //非班级标识行
+                        if (lastClassPos == -1)
+                        {
+                            //错误，没有配套班级标识符
+                            MessageBox.Show("保存进度错误,无配套班级标识,将不会继续读取抽签进度!",
+                                "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                        }
+                        int saveStuNum = -1;
+                        if(Int32.TryParse(nextLine, out saveStuNum))
+                        {
+                            //转换成功
+                            Classes[lastClassPos].ImportDraw(saveStuNum);
+                        }
+                        else
+                        {
+                            //转换失败
+                            MessageBox.Show("保存进度错误,有非数字字符,将不会继续读取抽签进度!",
+                                "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Classes[lastClassPos].Clear();
+                            break;
+                        }
+                    }
                 }
                 saveStream.Close();
             }
-            tips += "]";
-            if (totalSave > 0)
-            {
-                MessageBox.Show("已经抽取" + totalSave + "人，分别为：" + tips, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                draw.Text = nextDrawed + name[nextDrawed];
-            }
-            else
-            {
-                MessageBox.Show("抽签记录为空", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                draw.Text = "等待抽签";
-            }
-            drawedLabel.Text = totalSave + "";
-
+            chooseClassCombo.SelectedIndex = nowDrawingClass;
+            Refresh("等待抽取");
         }
-
-        private void button12_Click(object sender, EventArgs e)
+        public void Refresh(string drawLabelText = null, string drawNumLabel = null)
         {
-            MessageBox.Show("drawRandom "+ver+"\nPowered By C#\n2019 BYTEGOING\nGithub: https://www.github.com/BYTEGOING", "关于", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            nowDrawNameLabel.Text = drawLabelText;
+            nowDrawNumLabel.Text = drawNumLabel;
+            totalPersonLabel.Text = Classes[nowDrawingClass].Count + "";
+            drawedPersonLabel.Text = Classes[nowDrawingClass].DrawCount + "";
         }
-
-        private void button3_Click(object sender, EventArgs e)
+        private void AboutBtn_Click(object sender, EventArgs e)
         {
-            save();
-            DialogResult result = MessageBox.Show("确定要退出吗？", "drawRandom "+ver, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if(result == DialogResult.Yes)
+            MessageBox.Show("drawRandom " + ver + "\nPowered By C#\n2020 BYTEGOING\nGithub: https://www.github.com/BYTEGOING", 
+                "关于", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        private void ChooseClassCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (nowDrawingClass == chooseClassCombo.SelectedIndex) return;
+            nowDrawingClass = chooseClassCombo.SelectedIndex;
+            Refresh();
+            MessageBox.Show("切换到班级[" + chooseClassCombo.SelectedItem + "]成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        private void ExitBtn_Click(object sender, EventArgs e)
+        {
+            //记得保存
+            Save();
+            DialogResult result = MessageBox.Show("确定要退出吗？", "drawRandom " + ver, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
             {
                 System.Environment.Exit(0);
             }
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void ClearBtn_Click(object sender, EventArgs e)
         {
-            draw.Text = "正在抽签";
-            int nextNum = randomNum();
-            while(drawed[nextNum])
+            Classes[nowDrawingClass].Clear();
+            Refresh("清除完毕");
+        }
+        private void DrawBtn_Click(object sender, EventArgs e)
+        {
+            Student nowDraw = Classes[nowDrawingClass].Draw();
+            if(nowDraw == null)
             {
-                nextNum = randomNum();
+                //抽完了
+                MessageBox.Show("全部抽取完毕!将清除抽签记录...", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                clearBtn.PerformClick();
+                return;
             }
-            drawed[nextNum] = true;
-            //draw.Text = nextNum+name[nextNum];
-            draw.Text = name[nextNum];
-            totalSave++;
-            drawedLabel.Text = totalSave + "";
-            if (totalSave == totalNum - 1)
+            Refresh(nowDraw.Name, nowDraw.ID);
+        }
+        private void Save()
+        {
+            StreamWriter sw1 = new StreamWriter(saveFilePath);
+            string finalOutput = "";
+            for(int i = 0;i < Classes.Count;i++)
             {
-                draw.Text = "抽取完毕";
-                MessageBox.Show("已经将所有人抽完,清理中...","提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                clean();
+                finalOutput += Classes[i].Export();
+            }
+            sw1.Write(finalOutput);
+            sw1.Close();
+            Refresh("保存完成");
+        }
+    }
+    class Student
+    {
+        private string id;
+        private string name;
+        private bool draw = false;
+        public Student(string ID, string NAME)
+        {
+            id = ID;
+            name = NAME;
+        }
+        public string ID
+        {
+            get
+            {
+                return id;
             }
         }
-
-        private void button2_Click(object sender, EventArgs e)
+        public string Name
         {
-            clean();
+            get
+            {
+                return name;
+            }
+
+        }
+        public bool Draw
+        {
+            get
+            {
+                return draw;
+            }
+            set
+            {
+                draw = value;
+            }
+        }
+    }
+    class Class
+    {
+        private int max = 1000; //最大学生个数为1000个
+        private int count = 0; //现在有几个学生
+        private int drawCount = 0; //已经抽完多少了
+        private Student[] StudentList = new Student[1000];
+        private string name;
+        public int Max
+        {
+            get
+            {
+                return max;
+            }
+        } //仅读取
+        public int Count
+        {
+            get
+            {
+                return count;
+            }
+        } //仅读取
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+            }
+        }
+        public int DrawCount
+        {
+            get
+            {
+                return drawCount;
+            }
+        }
+        public Class(string name)
+        {
+            this.Name = name;
+        }
+        public bool Add(string id, string name)
+        {
+            if (count == max) return false; //若超出最大值则无法加入
+            //添加学生入班
+            StudentList[count] = new Student(id, name);
+            count++;
+            return true;
+        }
+        public Student Draw()
+        {
+            //随机抽签,返回值为被抽到的学生信息
+            if (drawCount == Count) return null;
+            int num;
+            do
+            {
+                num = new Random(Guid.NewGuid().GetHashCode()).Next(0, count);
+            } while (StudentList[num].Draw);
+            StudentList[num].Draw = true;
+            drawCount++;
+            return GetInfo(num);
+        }
+        public Student GetInfo(int num)
+        {
+            //由次序获取学生信息
+            return this.StudentList[num];
+        }
+        public void ImportDraw(string id)
+        {
+            //由学号导入已经抽过的学生信息
+            for(int i = 0;i < Count;i++)
+            {
+                if (StudentList[i].ID == id) StudentList[i].Draw = true;
+            }
+            drawCount++;
+        }
+        public void ImportDraw(int num)
+        {
+            //由次序导入已经抽过的学生信息
+            if (num >= Count) return; //意外情况，防止数组越界
+            StudentList[num].Draw = true;
+            drawCount++;
+        }
+        public void Clear()
+        {
+            //清除所有学生的抽签状态
+            for(int i = 0;i < Count;i++)
+            {
+                StudentList[i].Draw = false;
+            }
+            drawCount = 0;
+        }
+        public string Export()
+        {
+            string rtn = "[" + Name + "]\r\n";
+            if (drawCount == 0) return rtn;
+            else
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    if (StudentList[i].Draw)
+                    {
+                        rtn += i;
+                        rtn += "\r\n";
+                    }
+                }
+                return rtn;
+            }
         }
     }
 }
