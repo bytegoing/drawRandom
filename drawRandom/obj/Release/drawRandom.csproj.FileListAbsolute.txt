@@ -1,0 +1,10 @@
+E:\PROJ\drawRandom\drawRandom\bin\Release\drawRandom.exe
+E:\PROJ\drawRandom\drawRandom\bin\Release\drawRandom.pdb
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.csprojAssemblyReference.cache
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.HideFrm.resources
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.main.resources
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.Properties.Resources.resources
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.csproj.GenerateResource.cache
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.csproj.CoreCompileInputs.cache
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.exe
+E:\PROJ\drawRandom\drawRandom\obj\Release\drawRandom.pdb

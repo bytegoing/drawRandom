@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(main));
             this.drawBtn = new System.Windows.Forms.Button();
             this.clearBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -35,7 +37,6 @@
             this.totalPersonLabel = new System.Windows.Forms.Label();
             this.drawedPersonLabel = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.nowDrawNameLabel = new System.Windows.Forms.Label();
             this.exitBtn = new System.Windows.Forms.Button();
             this.aboutBtn = new System.Windows.Forms.Button();
@@ -43,6 +44,9 @@
             this.nowDrawNumLabel = new System.Windows.Forms.Label();
             this.chooseClassCombo = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.FixBtn = new System.Windows.Forms.Button();
+            this.hideBtn = new System.Windows.Forms.Button();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // drawBtn
@@ -73,7 +77,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("黑体", 15F);
-            this.label1.Location = new System.Drawing.Point(28, 393);
+            this.label1.Location = new System.Drawing.Point(31, 395);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(64, 25);
@@ -84,56 +88,45 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("黑体", 15F);
-            this.label2.Location = new System.Drawing.Point(142, 393);
+            this.label2.Location = new System.Drawing.Point(145, 395);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 25);
+            this.label2.Size = new System.Drawing.Size(129, 25);
             this.label2.TabIndex = 3;
-            this.label2.Text = "人";
+            this.label2.Text = "人 已抽取";
             // 
             // totalPersonLabel
             // 
             this.totalPersonLabel.AutoSize = true;
             this.totalPersonLabel.Font = new System.Drawing.Font("黑体", 15F);
-            this.totalPersonLabel.Location = new System.Drawing.Point(92, 393);
+            this.totalPersonLabel.Location = new System.Drawing.Point(88, 395);
             this.totalPersonLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.totalPersonLabel.Name = "totalPersonLabel";
-            this.totalPersonLabel.Size = new System.Drawing.Size(51, 25);
+            this.totalPersonLabel.Size = new System.Drawing.Size(64, 25);
             this.totalPersonLabel.TabIndex = 4;
-            this.totalPersonLabel.Text = "000";
+            this.totalPersonLabel.Text = "0000";
             // 
             // drawedPersonLabel
             // 
             this.drawedPersonLabel.AutoSize = true;
             this.drawedPersonLabel.Font = new System.Drawing.Font("黑体", 15F);
-            this.drawedPersonLabel.Location = new System.Drawing.Point(278, 393);
+            this.drawedPersonLabel.Location = new System.Drawing.Point(267, 395);
             this.drawedPersonLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.drawedPersonLabel.Name = "drawedPersonLabel";
-            this.drawedPersonLabel.Size = new System.Drawing.Size(51, 25);
+            this.drawedPersonLabel.Size = new System.Drawing.Size(64, 25);
             this.drawedPersonLabel.TabIndex = 7;
-            this.drawedPersonLabel.Text = "000";
+            this.drawedPersonLabel.Text = "0000";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("黑体", 15F);
-            this.label4.Location = new System.Drawing.Point(327, 393);
+            this.label4.Location = new System.Drawing.Point(323, 395);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 25);
             this.label4.TabIndex = 6;
             this.label4.Text = "人";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("黑体", 15F);
-            this.label5.Location = new System.Drawing.Point(190, 393);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(90, 25);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "已抽取";
             // 
             // nowDrawNameLabel
             // 
@@ -161,7 +154,7 @@
             // 
             // aboutBtn
             // 
-            this.aboutBtn.Location = new System.Drawing.Point(449, 390);
+            this.aboutBtn.Location = new System.Drawing.Point(445, 389);
             this.aboutBtn.Margin = new System.Windows.Forms.Padding(4);
             this.aboutBtn.Name = "aboutBtn";
             this.aboutBtn.Size = new System.Drawing.Size(52, 31);
@@ -214,12 +207,34 @@
             this.label7.TabIndex = 26;
             this.label7.Text = "选择班级:";
             // 
+            // FixBtn
+            // 
+            this.FixBtn.Image = global::drawRandom.Properties.Resources.fix;
+            this.FixBtn.Location = new System.Drawing.Point(422, 6);
+            this.FixBtn.Name = "FixBtn";
+            this.FixBtn.Size = new System.Drawing.Size(32, 32);
+            this.FixBtn.TabIndex = 27;
+            this.FixBtn.UseVisualStyleBackColor = true;
+            this.FixBtn.Click += new System.EventHandler(this.FixBtn_Click);
+            // 
+            // hideBtn
+            // 
+            this.hideBtn.Image = global::drawRandom.Properties.Resources.minimize;
+            this.hideBtn.Location = new System.Drawing.Point(469, 6);
+            this.hideBtn.Name = "hideBtn";
+            this.hideBtn.Size = new System.Drawing.Size(32, 32);
+            this.hideBtn.TabIndex = 28;
+            this.hideBtn.UseVisualStyleBackColor = true;
+            this.hideBtn.Click += new System.EventHandler(this.HideBtn_Click);
+            // 
             // main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(512, 439);
             this.ControlBox = false;
+            this.Controls.Add(this.hideBtn);
+            this.Controls.Add(this.FixBtn);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.chooseClassCombo);
             this.Controls.Add(this.nowDrawNumLabel);
@@ -229,15 +244,16 @@
             this.Controls.Add(this.nowDrawNameLabel);
             this.Controls.Add(this.drawedPersonLabel);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.label5);
             this.Controls.Add(this.totalPersonLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.clearBtn);
             this.Controls.Add(this.drawBtn);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "main";
             this.Text = "drawRandom";
+            this.Load += new System.EventHandler(this.Main_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -252,7 +268,6 @@
         private System.Windows.Forms.Label totalPersonLabel;
         private System.Windows.Forms.Label drawedPersonLabel;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label nowDrawNameLabel;
         private System.Windows.Forms.Button exitBtn;
         private System.Windows.Forms.Button aboutBtn;
@@ -260,6 +275,9 @@
         private System.Windows.Forms.Label nowDrawNumLabel;
         private System.Windows.Forms.ComboBox chooseClassCombo;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button FixBtn;
+        private System.Windows.Forms.Button hideBtn;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }
 
