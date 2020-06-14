@@ -32,13 +32,19 @@ namespace drawRandom
 
             if (!File.Exists(nameFilePath))
             {
-                MessageBox.Show("姓名文件不存在!请检查目录下是否存在name.in文件或检查程序是否有权限访问本目录文件!", 
+                MessageBox.Show("姓名文件不存在!请先利用模板xls文件生成或检查程序是否有权限访问本目录文件!", 
                     "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 System.Environment.Exit(0);
             }
             StreamReader nameStream = new StreamReader(nameFilePath, Encoding.Default);
-            string nextLine;
-            while ((nextLine = nameStream.ReadLine()) != null)
+            string nextLine = nameStream.ReadLine();
+            if(nextLine == null)
+            {
+                MessageBox.Show("姓名文件内容为空!请利用模板xls文件生成后再运行!",
+                    "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Environment.Exit(0);
+            }
+            while (nextLine != null)
             {
                 nextLine = nextLine.Trim();
                 int classCharStart = nextLine.IndexOf('[');
@@ -76,6 +82,7 @@ namespace drawRandom
                         System.Environment.Exit(0);
                     }
                 }
+                nextLine = nameStream.ReadLine();
             }
             nameStream.Close();
 
